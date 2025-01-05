@@ -247,9 +247,9 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/", swaggerUi.serve);
+app.use("/swagger", swaggerUi.serve);
 app.get(
-  "/",
+  "/swagger",
   swaggerUi.setup(swaggerDocument, {
     customCss: ".swagger-ui .topbar { display: none }",
     customSiteTitle: "Moshaf API Documentation",
