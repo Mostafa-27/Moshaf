@@ -1,4 +1,5 @@
 // server.js
+const serverless = require("serverless-http");
 const express = require("express");
 const cors = require("cors");
 const colors = require("colors");
@@ -275,8 +276,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something broke!" });
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`.bgMagenta.white);
-});
+// app.listen(8080, () => {
+//   console.log(`Server running on port ${port}`.bgMagenta.white);
+// });
 
+// module.exports = app;
 module.exports = app;
+module.exports.handler = serverless(app);
