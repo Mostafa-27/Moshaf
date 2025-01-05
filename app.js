@@ -9,12 +9,6 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3301;
 
-// Middleware - MUST BE BEFORE ROUTES
-app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 // Swagger documentation
 const swaggerDocument = {
   openapi: "3.0.0",
@@ -247,23 +241,36 @@ const swaggerDocument = {
   },
 };
 
-// Swagger setup
-app.use("/api-docs", swaggerUi.serve);
-app.get(
-  "/api-docs",
-  swaggerUi.setup(swaggerDocument, {
-    customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "Moshaf API Documentation",
-    explorer: true,
-  })
-);
+// Middleware
+// app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+// app.use(cors());
+// app.use(express.json());
 
-// Root redirect
+// Serve swagger spec
+app.get("/swagger.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerDocument);
+});
+
+// Swagger UI setup
+const swaggerUiOptions = {
+  customCss: ".swagger-ui .topbar { display: none }",
+  customSiteTitle: "Moshaf API Documentation",
+  swaggerOptions: {
+    url: "https://moshaf-woad.vercel.app/swagger.json",
+    persistAuthorization: true,
+  },
+};
+
+app.use("/api-docs", swaggerUi.serve);
+app.get("/api-docs", swaggerUi.setup(null, swaggerUiOptions));
+
+// Add a redirect from root to api-docs
 app.get("/", (req, res) => {
   res.redirect("/api-docs");
 });
 
-// API Routes
+// Routes
 app.use("/api/ayat", require("./routes/ayatRoutes"));
 
 // Error handling middleware

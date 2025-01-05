@@ -8,16 +8,27 @@
   ],
   "routes": [
     {
+      "src": "/swagger.json",
+      "dest": "app.js"
+    },
+    {
+      "src": "/api-docs",
+      "dest": "app.js"
+    },
+    {
       "src": "/api-docs/(.*)",
-      "dest": "/api/index.js"
+      "dest": "app.js"
     },
     {
       "src": "/api/(.*)",
-      "dest": "/api/index.js"
+      "dest": "app.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.js"
+      "dest": "app.js"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
