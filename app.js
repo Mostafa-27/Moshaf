@@ -124,6 +124,11 @@ const swaggerDocument = {
                     sura: { type: "integer" },
                     aya: { type: "integer" },
                     text: { type: "string" },
+                    sajda: {
+                      type: "string",
+                      enum: ["obligatory", "recommended", null],
+                      description: "Type of sajda if present, null otherwise",
+                    },
                   },
                 },
               },
@@ -247,6 +252,108 @@ const swaggerDocument = {
           },
           404: {
             description: "No verses found in the specified range",
+          },
+        },
+      },
+    },
+    "/api/ayat/page/{pageNumber}": {
+      get: {
+        summary: "Get verses for a specific page of the Quran",
+        parameters: [
+          {
+            name: "pageNumber",
+            in: "path",
+            required: true,
+            description: "The page number (1-604)",
+            schema: {
+              type: "integer",
+              minimum: 1,
+              maximum: 604,
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "List of verses on the specified page",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    page: { type: "integer" },
+                    startVerse: {
+                      type: "object",
+                      properties: {
+                        sura: { type: "integer" },
+                        aya: { type: "integer" },
+                      },
+                    },
+                    endVerse: {
+                      type: "object",
+                      properties: {
+                        sura: { type: "integer" },
+                        aya: { type: "integer" },
+                      },
+                    },
+                    verses: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          index: { type: "integer" },
+                          sura: { type: "integer" },
+                          aya: { type: "integer" },
+                          text: { type: "string" },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Invalid page number",
+          },
+          404: {
+            description: "Page not found",
+          },
+        },
+      },
+    },
+    "/api/ayat/sajda": {
+      get: {
+        summary: "Get all sajda verses in the Quran",
+        responses: {
+          200: {
+            description: "List of sajda verses",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      sura: { type: "integer" },
+                      aya: { type: "integer" },
+                      type: {
+                        type: "string",
+                        enum: ["obligatory", "recommended"],
+                      },
+                      verse: {
+                        type: "object",
+                        properties: {
+                          index: { type: "integer" },
+                          sura: { type: "integer" },
+                          aya: { type: "integer" },
+                          text: { type: "string" },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },

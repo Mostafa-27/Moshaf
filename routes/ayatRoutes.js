@@ -5,6 +5,10 @@ const {
   getAyaBySuraAndNumber,
   searchAyat,
   getAyatRange,
+  getVersesRange,
+  getSpecificVerse,
+  QuranData,
+  getAyatByPage,
 } = require("../utils/quranData");
 
 // Get all Ayat of a specific Sura
@@ -72,6 +76,67 @@ router.get("/range", async (req, res) => {
   } catch (error) {
     console.error("Error fetching ayat range:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Get verses for a specific page of the Quran
+router.get("/page/:pageNumber", async (req, res) => {
+  try {
+    const pageNumber = parseInt(req.params.pageNumber);
+
+    if (pageNumber < 1 || pageNumber > 604) {
+      return res
+        .status(400)
+        .json({ error: "Invalid page number. Must be between 1 and 604." });
+    }
+
+    const verses = getAyatByPage(pageNumber);
+
+    if (verses.length === 0) {
+      return res.status(404).json({ error: "Page not found" });
+    }
+
+    // Get start verse for current page and next page
+    const startVerse = QuranData.Page[pageNumber];
+    const endVerse = QuranData.Page[pageNumber + 1];
+
+    res.json({
+      page: pageNumber,
+      startVerse: {
+        sura: startVerse[0],
+        aya: startVerse[1],
+      },
+      endVerse: endVerse
+        ? {
+            sura: endVerse[0],
+            aya: endVerse[1] - 1,
+          }
+        : null,
+      verses,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all sajda verses in the Quran
+router.get("/sajda", async (req, res) => {
+  try {
+    const sajdaVerses = await Promise.all(
+      QuranData.Sajda.slice(1).map(async ([sura, aya, type]) => {
+        const verse = await getSpecificVerse(sura, aya);
+        return {
+          sura,
+          aya,
+          type,
+          verse,
+        };
+      })
+    );
+
+    res.json(sajdaVerses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
