@@ -48,8 +48,15 @@ for (const line of lines) {
         return val;
       });
 
-      // Skip header rows and ensure all values are present
-      if (index && sura && aya && text && !text.includes("`")) {
+      // Skip header-like rows and ensure all values are present
+      if (
+        index &&
+        sura &&
+        aya &&
+        text &&
+        !/index|sura|aya|text/i.test(text) &&
+        !/^`/.test(index)
+      ) {
         values.push(`${index}|${sura}|${aya}|${text}`);
       }
     }
