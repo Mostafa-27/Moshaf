@@ -1,14 +1,14 @@
 {
   "name": "newproj",
   "version": "1.0.0",
-  "main": "api/index.js",
+  "main": "app.js",
   "engines": {
     "node": ">=14.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js",
-    "start": "node api/index.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
