@@ -257,7 +257,7 @@ const swaggerUiOptions = {
   customCss: ".swagger-ui .topbar { display: none }",
   customSiteTitle: "Moshaf API Documentation",
   swaggerOptions: {
-    url: "/swagger.json",
+    url: "https://moshaf-woad.vercel.app/swagger.json",
     persistAuthorization: true,
   },
 };
