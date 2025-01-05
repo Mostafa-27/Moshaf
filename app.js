@@ -28,8 +28,14 @@ const swaggerDocument = {
   },
   servers: [
     {
-      url: "/docs", // ✅ Auto-detect the base URL on Vercel
-      description: "API Documentation",
+      url:
+        process.env.NODE_ENV === "production"
+          ? "https://moshaf-woad.vercel.app"
+          : `http://localhost:${process.env.PORT || 3000}`,
+      description:
+        process.env.NODE_ENV === "production"
+          ? "Production Server"
+          : "Development Server",
     },
   ],
   paths: {
@@ -73,15 +79,7 @@ const swaggerDocument = {
 };
 
 // Swagger setup
-app.use(
-  "/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerDocument, {
-    customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "Moshaf API Documentation",
-    explorer: true,
-  })
-);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Root redirect
 app.get("/", (req, res) => {
