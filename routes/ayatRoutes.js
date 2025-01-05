@@ -1,14 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../config/database");
+const {
+  getAyatBySura,
+  getAyaBySuraAndNumber,
+  searchAyat,
+  getAyatRange,
+} = require("../utils/quranData");
 
 // Get all Ayat of a specific Sura
 router.get("/sura/:suraId", async (req, res) => {
   try {
-    const [ayat] = await pool.execute(
-      "SELECT * FROM quran_text WHERE sura = ? ORDER BY aya",
-      [req.params.suraId]
-    );
+    const ayat = getAyatBySura(req.params.suraId);
 
     if (ayat.length === 0) {
       return res.status(404).json({ error: "No ayat found for this sura" });
@@ -24,16 +26,13 @@ router.get("/sura/:suraId", async (req, res) => {
 // Get a specific Aya by Sura and Aya number
 router.get("/sura/:suraId/aya/:ayaNumber", async (req, res) => {
   try {
-    const [aya] = await pool.execute(
-      "SELECT * FROM quran_text WHERE sura = ? AND aya = ?",
-      [req.params.suraId, req.params.ayaNumber]
-    );
+    const aya = getAyaBySuraAndNumber(req.params.suraId, req.params.ayaNumber);
 
-    if (aya.length === 0) {
+    if (!aya) {
       return res.status(404).json({ error: "Aya not found" });
     }
 
-    res.json(aya[0]);
+    res.json(aya);
   } catch (error) {
     console.error("Error fetching aya:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -43,10 +42,7 @@ router.get("/sura/:suraId/aya/:ayaNumber", async (req, res) => {
 // Search Ayat by text
 router.get("/search/:query", async (req, res) => {
   try {
-    const [ayat] = await pool.execute(
-      "SELECT * FROM quran_text WHERE text LIKE ?",
-      [`%${req.params.query}%`]
-    );
+    const ayat = searchAyat(req.params.query);
     res.json(ayat);
   } catch (error) {
     console.error("Error searching ayat:", error);
@@ -59,13 +55,14 @@ router.get("/range", async (req, res) => {
   try {
     const { startSura, startAya, endSura, endAya } = req.query;
 
-    const [ayat] = await pool.execute(
-      `SELECT * FROM quran_text 
-       WHERE (sura > ? OR (sura = ? AND aya >= ?))
-       AND (sura < ? OR (sura = ? AND aya <= ?))
-       ORDER BY sura, aya`,
-      [startSura, startSura, startAya, endSura, endSura, endAya]
-    );
+    if (!startSura || !startAya || !endSura || !endAya) {
+      return res.status(400).json({
+        error:
+          "Missing required query parameters: startSura, startAya, endSura, endAya",
+      });
+    }
+
+    const ayat = getAyatRange(startSura, startAya, endSura, endAya);
 
     if (ayat.length === 0) {
       return res.status(404).json({ error: "No ayat found in this range" });
