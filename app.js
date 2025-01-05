@@ -249,14 +249,9 @@ const swaggerDocument = {
 
 // Swagger setup
 app.use("/api-docs", swaggerUi.serve);
-app.get(
-  "/api-docs",
-  swaggerUi.setup(swaggerDocument, {
-    customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "Moshaf API Documentation",
-    explorer: true,
-  })
-);
+app.get("/api-docs", (req, res) => {
+  return res.json({ message: "hello" });
+});
 
 // Root redirect
 app.get("/", (req, res) => {
