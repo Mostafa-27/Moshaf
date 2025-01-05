@@ -250,7 +250,7 @@ const swaggerDocument = {
     },
   },
 };
-app.use("/docs", express.static("public/swagger"));
+app.use("/docs", express.static(path.join(__dirname, "public/swagger")));
 
 // Swagger setup
 app.use("/docs", swaggerUi.serve);
@@ -258,6 +258,11 @@ app.get(
   "/docs",
   swaggerUi.setup(swaggerDocument, {
     customCss: ".swagger-ui .topbar { display: none }",
+    customCssUrl: "/docs/swagger-ui.css",
+    customJs: [
+      "/docs/swagger-ui-bundle.js",
+      "/docs/swagger-ui-standalone-preset.js",
+    ],
     customSiteTitle: "Moshaf API Documentation",
     explorer: true,
   })
