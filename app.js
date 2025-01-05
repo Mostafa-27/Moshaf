@@ -23,8 +23,14 @@ const swaggerDocument = {
   },
   servers: [
     {
-      url: `http://localhost:${port}`,
-      description: "Development server",
+      url:
+        process.env.NODE_ENV === "production"
+          ? "https://moshaf-woad.vercel.app/"
+          : `http://localhost:${port}`,
+      description:
+        process.env.NODE_ENV === "production"
+          ? "Production server"
+          : "Development server",
     },
   ],
   paths: {

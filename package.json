@@ -2,6 +2,9 @@
   "name": "newproj",
   "version": "1.0.0",
   "main": "app.js",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js",
@@ -18,7 +21,9 @@
     "express": "^4.21.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.12.0",
-    "nodemon": "^3.1.9",
     "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
