@@ -25,7 +25,7 @@ const swaggerDocument = {
     {
       url:
         process.env.NODE_ENV === "production"
-          ? "https://moshaf-woad.vercel.app/"
+          ? "https://moshaf-woad.vercel.app"
           : `http://localhost:${port}`,
       description:
         process.env.NODE_ENV === "production"
@@ -246,15 +246,24 @@ app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(cors());
 app.use(express.json());
 
-// Swagger Routes
+// Serve swagger spec
+app.get("/swagger.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerDocument);
+});
+
+// Swagger UI setup
+const swaggerUiOptions = {
+  customCss: ".swagger-ui .topbar { display: none }",
+  customSiteTitle: "Moshaf API Documentation",
+  swaggerOptions: {
+    url: "/swagger.json",
+    persistAuthorization: true,
+  },
+};
+
 app.use("/api-docs", swaggerUi.serve);
-app.get(
-  "/api-docs",
-  swaggerUi.setup(swaggerDocument, {
-    customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "Moshaf API Documentation",
-  })
-);
+app.get("/api-docs", swaggerUi.setup(null, swaggerUiOptions));
 
 // Add a redirect from root to api-docs
 app.get("/", (req, res) => {
