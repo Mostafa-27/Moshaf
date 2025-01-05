@@ -242,20 +242,26 @@ const swaggerDocument = {
 };
 
 // Middleware
-app.use(morgan("dev"));
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use("/swagger", swaggerUi.serve);
+// Swagger Routes
+app.use("/api-docs", swaggerUi.serve);
 app.get(
-  "/swagger",
+  "/api-docs",
   swaggerUi.setup(swaggerDocument, {
     customCss: ".swagger-ui .topbar { display: none }",
     customSiteTitle: "Moshaf API Documentation",
   })
 );
 
+// Add a redirect from root to api-docs
+app.get("/", (req, res) => {
+  res.redirect("/api-docs");
+});
+
+// Routes
 app.use("/api/ayat", require("./routes/ayatRoutes"));
 
 // Error handling middleware
