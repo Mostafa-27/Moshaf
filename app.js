@@ -250,6 +250,7 @@ const swaggerDocument = {
     },
   },
 };
+app.use("/docs", express.static("public/swagger"));
 
 // Swagger setup
 app.use("/docs", swaggerUi.serve);
