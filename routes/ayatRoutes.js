@@ -175,8 +175,8 @@ router.get("/getpage/:suraId/aya/:ayaNumber", async (req, res) => {
 
     res.json({
       sura: suraId,
-      // aya: ayaNumber,
-      // page: pageNumber,
+      aya: ayaNumber,
+      page: pageNumber,
     });
     console.log(pageNumber);
   } catch (error) {
