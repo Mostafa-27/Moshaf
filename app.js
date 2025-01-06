@@ -358,6 +358,66 @@ const swaggerDocument = {
         },
       },
     },
+    "/api/ayat/getpage/{suraId}/aya/{ayaNumber}": {
+      get: {
+        summary: "Get page number for a specific verse",
+        parameters: [
+          {
+            name: "suraId",
+            in: "path",
+            required: true,
+            description: "The sura number (1-114)",
+            schema: {
+              type: "integer",
+              minimum: 1,
+              maximum: 114,
+            },
+          },
+          {
+            name: "ayaNumber",
+            in: "path",
+            required: true,
+            description: "The verse number within the sura",
+            schema: {
+              type: "integer",
+              minimum: 1,
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Page number containing the requested verse",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    sura: {
+                      type: "integer",
+                      description: "The sura number",
+                    },
+                    aya: {
+                      type: "integer",
+                      description: "The verse number",
+                    },
+                    page: {
+                      type: "integer",
+                      description: "The page number where the verse is located",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Invalid sura or aya number, or verse not found",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
   },
 };
 

@@ -3,6 +3,7 @@ const path = require("path");
 
 // Cache for the parsed Quran data
 let quranData = null;
+const QuranData2 = require("./Quran");
 
 const QuranData = {
   Page: [
@@ -784,6 +785,53 @@ function getSajdaType(sura, aya) {
   return sajdaVerse ? sajdaVerse[2] : null;
 }
 
+function getPageBySuraAya(suraId, ayaId) {
+  const targetSura = parseInt(suraId);
+  const targetAya = parseInt(ayaId);
+
+  // Debugging: Check the content of QuranData
+  // console.log("QuranData:", QuranData2);
+
+  if (!Array.isArray(QuranData2)) {
+    throw new Error("QuranData is not an array");
+  }
+
+  // Validate input
+  if (targetSura < 1 || targetSura > 114) {
+    throw new Error("Invalid sura number. Must be between 1 and 114.");
+  }
+  // Loop through the pages in QuranData
+  for (const page of QuranData2) {
+    for (const content of page.content) {
+      if (
+        content.surah === targetSura ||
+        (QuranData2[page.page - 1]?.content[0]?.surah < targetSura &&
+          QuranData2[page.page - 1]?.content[1]?.surah > targetSura)
+      ) {
+        console.log(
+          QuranData2[page.page - 1]?.content[0]?.surah,
+          "content 0",
+          QuranData2[page.page - 1]?.content[1]?.surah,
+          "content 1",
+          QuranData2[page.page - 1]
+        );
+        if (
+          QuranData2[page.page - 1]?.content[0]?.surah < targetSura &&
+          QuranData2[page.page - 1]?.content[1]?.surah > targetSura
+        ) {
+          return page.page;
+        }
+        if (content.fromVerse <= targetAya && targetAya <= content.toVerse) {
+          return page.page;
+        }
+        return page.page;
+      }
+    }
+  }
+  return "page not found";
+
+  throw new Error("Verse not found");
+}
 module.exports = {
   getAyatBySura,
   getAyaBySuraAndNumber,
@@ -791,5 +839,6 @@ module.exports = {
   getAyatRange,
   getVersesRange,
   getAyatByPage,
+  getPageBySuraAya,
   QuranData,
 };

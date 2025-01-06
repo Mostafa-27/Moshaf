@@ -9,6 +9,7 @@ const {
   getSpecificVerse,
   QuranData,
   getAyatByPage,
+  getPageBySuraAya,
 } = require("../utils/quranData");
 
 // Get all Ayat of a specific Sura
@@ -90,15 +91,31 @@ router.get("/page/:pageNumber", async (req, res) => {
         .json({ error: "Invalid page number. Must be between 1 and 604." });
     }
 
+    // Debugging log to check QuranData.Page
+    // console.log("QuranData.Page:", QuranData.Page);
+
+    if (!QuranData) {
+      console.error("QuranData.Page is undefined");
+      return res
+        .status(500)
+        .json({ error: "Quran page data is not available" });
+    }
+
     const verses = getAyatByPage(pageNumber);
 
     if (verses.length === 0) {
       return res.status(404).json({ error: "Page not found" });
     }
 
-    // Get start verse for current page and next page
     const startVerse = QuranData.Page[pageNumber];
     const endVerse = QuranData.Page[pageNumber + 1];
+
+    if (!startVerse) {
+      console.error(`Start verse not found for page ${pageNumber}`);
+      return res
+        .status(404)
+        .json({ error: "Start verse not found for this page" });
+    }
 
     res.json({
       page: pageNumber,
@@ -115,7 +132,8 @@ router.get("/page/:pageNumber", async (req, res) => {
       verses,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching page:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -137,6 +155,38 @@ router.get("/sajda", async (req, res) => {
     res.json(sajdaVerses);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Get page number for a specific sura and aya
+router.get("/getpage/:suraId/aya/:ayaNumber", async (req, res) => {
+  try {
+    const suraId = parseInt(req.params.suraId);
+    const ayaNumber = parseInt(req.params.ayaNumber);
+
+    // Input validation
+    if (isNaN(suraId) || isNaN(ayaNumber)) {
+      return res.status(400).json({
+        error: "Sura ID and Aya number must be valid numbers",
+      });
+    }
+
+    const pageNumber = getPageBySuraAya(suraId, ayaNumber);
+
+    res.json({
+      sura: suraId,
+      // aya: ayaNumber,
+      // page: pageNumber,
+    });
+    console.log(pageNumber);
+  } catch (error) {
+    if (
+      error.message.includes("Invalid sura number") ||
+      error.message.includes("Verse not found")
+    ) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
